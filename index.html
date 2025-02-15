@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NPS | UPS | OPS Pension Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 20px;
+            padding: 20px;
+        }
+        h2 {
+            text-align: center;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px #ccc;
+        }
+        label {
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background: #007bff;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>NPS | UPS | OPS Pension Calculator</h2>
+
+    <label>Current Basic Salary (₹):</label>
+    <input type="number" id="basicSalary" value="76500">
+
+    <label>Current DA (%):</label>
+    <input type="number" id="currentDA" value="56">
+
+    <label>Total Service Years:</label>
+    <input type="number" id="serviceYears" value="34">
+
+    <label>Retirement Date (MM/YYYY):</label>
+    <input type="text" id="retirementDate" value="06/2043">
+
+    <label>MACP Years (MM/YYYY):</label>
+    <input type="text" id="macpYears" value="06/2028, 06/2038">
+
+    <label>Existing NPS Fund (₹):</label>
+    <input type="number" id="npsFund" value="4450000">
+
+    <button onclick="calculatePension()">Calculate</button>
+
+    <table>
+        <tr>
+            <th>Scheme</th>
+            <th>Total Fund</th>
+            <th>Fund in Hand</th>
+            <th>Monthly Pension</th>
+            <th>Additional Benefits</th>
+            <th>Gratuity</th>
+            <th>Leave Encashment</th>
+            <th>Insurance</th>
+        </tr>
+        <tr>
+            <td>NPS</td>
+            <td id="npsTotalFund"></td>
+            <td id="npsFundInHand"></td>
+            <td id="npsMonthlyPension"></td>
+            <td id="npsAdditionalBenefits"></td>
+            <td id="npsGratuity"></td>
+            <td>Available</td>
+            <td>Available</td>
+        </tr>
+        <tr>
+            <td>UPS</td>
+            <td id="upsTotalFund"></td>
+            <td id="upsFundInHand"></td>
+            <td id="upsMonthlyPension"></td>
+            <td id="upsAdditionalBenefits"></td>
+            <td id="upsGratuity"></td>
+            <td>Available</td>
+            <td>Available</td>
+        </tr>
+        <tr>
+            <td>OPS</td>
+            <td id="opsTotalFund"></td>
+            <td id="opsFundInHand"></td>
+            <td id="opsMonthlyPension"></td>
+            <td>N/A</td>
+            <td id="opsGratuity"></td>
+            <td>Available</td>
+            <td>Available</td>
+        </tr>
+    </table>
+</div>
+
+<script>
+function calculatePension() {
+    let basicSalary = parseFloat(document.getElementById('basicSalary').value);
+    let daPercent = parseFloat(document.getElementById('currentDA').value);
+    let serviceYears = parseInt(document.getElementById('serviceYears').value);
+    let npsFund = parseFloat(document.getElementById('npsFund').value);
+
+    let daValue = (basicSalary * daPercent) / 100;
+    let lastSalaryWithDA = basicSalary + daValue;
+    
+    // NPS Calculation
+    let npsTotalFund = npsFund * Math.pow(1.071, serviceYears);
+    let npsFundInHand = npsTotalFund * 0.6;
+    let npsMonthlyPension = npsTotalFund * 0.4 * 0.005;
+    let npsAdditionalBenefits = npsTotalFund * 0.4;
+
+    // UPS Calculation
+    let upsTotalFund = npsTotalFund;
+    let upsFundInHand = (lastSalaryWithDA / 5) * serviceYears;
+    let upsMonthlyPension = Math.min(serviceYears, 25) * 0.02 * lastSalaryWithDA;
+    let upsAdditionalBenefits = 0; // To be computed separately
+
+    // OPS Calculation
+    let opsTotalFund = npsTotalFund * 0.4166;
+    let opsFundInHand = upsFundInHand;
+    let opsMonthlyPension = lastSalaryWithDA / 2;
+
+    // Gratuity Calculation
+    let gratuity = Math.min(((basicSalary + daValue) * serviceYears) / 2, 2500000);
+
+    // Updating Table Values
+
+    document.getElementById('npsTotalFund').innerText = `₹${npsTotalFund.toFixed(2)}`;
+    document.getElementById('npsFundInHand').innerText = `₹${npsFundInHand.toFixed(2)}`;
+    document.getElementById('npsMonthlyPension').innerText = `₹${npsMonthlyPension.toFixed(2)}`;
+    document.getElementById('npsAdditionalBenefits').innerText = `₹${npsAdditionalBenefits.toFixed(2)}`;
+    document.getElementById('npsGratuity').innerText = `₹${gratuity.toFixed(2)}`;
+
+    document.getElementById('upsTotalFund').innerText = `₹${upsTotalFund.toFixed(2)}`;
+    document.getElementById('upsFundInHand').innerText = `₹${upsFundInHand.toFixed(2)}`;
+    document.getElementById('upsMonthlyPension').innerText = `₹${upsMonthlyPension.toFixed(2)}`;
+    document.getElementById('upsAdditionalBenefits').innerText = `₹${upsAdditionalBenefits.toFixed(2)}`;
+    document.getElementById('upsGratuity').innerText = `₹${gratuity.toFixed(2)}`;
+
+    document.getElementById('opsTotalFund').innerText = `₹${opsTotalFund.toFixed(2)}`;
+    document.getElementById('opsFundInHand').innerText = `₹${opsFundInHand.toFixed(2)}`;
+    document.getElementById('opsMonthlyPension').innerText = `₹${opsMonthlyPension.toFixed(2)}`;
+    document.getElementById('opsGratuity').innerText = `₹${gratuity.toFixed(2)}`;
+}
+</script>
+
+</body>
+</html>
